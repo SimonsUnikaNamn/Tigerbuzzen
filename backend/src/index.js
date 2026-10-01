@@ -16,7 +16,16 @@ function json(data, status, origin) {
 function isAuthorized(request, env) {
   const auth = request.headers.get("Authorization") || "";
   const [scheme, token] = auth.split(" ");
-  return scheme === "Bearer" && !!env.PASSPHRASE && token === env.PASSPHRASE;
+  if (scheme !== "Bearer" || !token || !env.PASSPHRASE) return false;
+
+  let decoded;
+  try {
+    decoded = decodeURIComponent(token);
+  } catch {
+    return false;
+  }
+
+  return decoded === env.PASSPHRASE;
 }
 
 async function handleListBookings(url, env, origin) {

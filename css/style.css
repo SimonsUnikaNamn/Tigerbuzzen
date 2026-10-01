@@ -160,19 +160,6 @@ button {
 
 .gate-button:active { transform: scale(0.98); background: var(--tiger-orange-deep); }
 
-.gate-hint {
-  margin: 18px 0 0;
-  font-size: 12px;
-  color: var(--ink-soft);
-}
-
-.gate-hint code {
-  background: var(--tiger-cream-dim);
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-size: 11px;
-}
-
 /* ---------- App shell ---------- */
 .app {
   min-height: 100dvh;
@@ -281,6 +268,15 @@ button {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
+}
+
+.calendar-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 32px 8px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .day-cell {
