@@ -1,0 +1,12 @@
+name = "tigerbuzz-api"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+# Set to your GitHub Pages origin once deployed, e.g. "https://yourname.github.io"
+ALLOWED_ORIGIN = "*"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tigerbuzz"
+database_id = "REPLACE_AFTER_RUNNING_NPM_RUN_DB_CREATE"

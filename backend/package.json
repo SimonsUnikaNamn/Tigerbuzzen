@@ -1,0 +1,15 @@
+{
+  "name": "tigerbuzz-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create tigerbuzz",
+    "db:migrate:local": "wrangler d1 execute tigerbuzz --local --file=./schema.sql",
+    "db:migrate:remote": "wrangler d1 execute tigerbuzz --remote --file=./schema.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^3.78.0"
+  }
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<title>Tigerbuzzen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c85d0a">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐯</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="gate" class="gate">
+  <div class="gate-card">
+    <div class="gate-stripes" aria-hidden="true"></div>
+    <div class="gate-content">
+      <span class="gate-emoji" aria-hidden="true">🐯</span>
+      <h1 class="gate-title">Tigerbuzzen</h1>
+      <p class="gate-subtitle">Booking av Tigerstadsteatrets ID Buzz</p>
+      <form id="gate-form" class="gate-form" autocomplete="off">
+        <label for="passphrase" class="gate-label">Skriv inn passordet</label>
+        <input id="passphrase" name="passphrase" type="password" inputmode="text" placeholder="•••••••" class="gate-input" autofocus>
+        <p id="gate-error" class="gate-error" hidden>Feil passord — prøv igjen.</p>
+        <button type="submit" class="gate-button">Lås opp <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="gate-hint">Mock-modus — disse fungerer: <code>roar</code>, <code>tigerbuzz</code></p>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="app" hidden>
+
+  <header class="topbar">
+    <div class="topbar-stripes" aria-hidden="true"></div>
+    <div class="topbar-row">
+      <span class="brand"><span aria-hidden="true">🐯</span> Tigerbuzzen</span>
+      <button id="logout" class="icon-btn" title="Lås" aria-label="Lås">🔒</button>
+    </div>
+    <p class="brand-sub">Tigerstadsteatrets ID Buzz</p>
+  </header>
+
+  <main class="main">
+
+    <section class="calendar-card">
+      <div class="month-nav">
+        <button id="prev-month" class="nav-btn" aria-label="Forrige måned">‹</button>
+        <h2 id="month-label" class="month-label"></h2>
+        <button id="next-month" class="nav-btn" aria-label="Neste måned">›</button>
+      </div>
+
+      <div class="weekday-row">
+        <span>ma</span><span>ti</span><span>on</span><span>to</span><span>fr</span><span>lø</span><span>sø</span>
+      </div>
+
+      <div id="calendar-grid" class="calendar-grid"></div>
+
+      <div class="legend">
+        <span class="legend-item"><i class="dot dot-green"></i> Ledig</span>
+        <span class="legend-item"><i class="dot dot-yellow"></i> Delvis booket</span>
+        <span class="legend-item"><i class="dot dot-red"></i> Fullbooket</span>
+      </div>
+
+      <button id="open-booking-btn" class="primary-btn book-buzz-btn">Book Buzz'en</button>
+    </section>
+
+  </main>
+
+  <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+
+  <section id="day-sheet" class="day-sheet" hidden aria-hidden="true">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-header">
+      <div>
+        <h3 id="sheet-date" class="sheet-date"></h3>
+        <span id="sheet-status" class="sheet-status"></span>
+      </div>
+      <button id="sheet-close" class="icon-btn" aria-label="Lukk">✕</button>
+    </div>
+
+    <div id="sheet-bookings" class="sheet-bookings"></div>
+  </section>
+
+  <section id="booking-sheet" class="day-sheet" hidden aria-hidden="true">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-header">
+      <h3 class="sheet-date">Book ID Buzz</h3>
+      <button id="booking-close" class="icon-btn" aria-label="Lukk">✕</button>
+    </div>
+
+    <form id="booking-form" class="booking-form" autocomplete="off">
+      <label class="form-label" for="booking-person">Booket av</label>
+      <input id="booking-person" class="form-input" list="borrower-list" placeholder="Ditt navn" required>
+      <datalist id="borrower-list"></datalist>
+
+      <div class="form-row">
+        <div class="form-col">
+          <label class="form-label" for="booking-start-date">Startdato</label>
+          <input id="booking-start-date" type="date" class="form-input" required>
+        </div>
+        <div class="form-col">
+          <label class="form-label" for="booking-start-time">Starttid</label>
+          <input id="booking-start-time" type="time" class="form-input" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <label class="form-label" for="booking-end-date">Sluttdato</label>
+          <input id="booking-end-date" type="date" class="form-input" required>
+        </div>
+        <div class="form-col">
+          <label class="form-label" for="booking-end-time">Slutttid</label>
+          <input id="booking-end-time" type="time" class="form-input" required>
+        </div>
+      </div>
+
+      <label class="form-label" for="booking-comment">Kommentar</label>
+      <textarea id="booking-comment" class="form-input form-textarea" rows="3" placeholder="Hva skal den brukes til?" required></textarea>
+
+      <p id="booking-conflict" class="booking-conflict" hidden></p>
+
+      <button id="confirm-booking-btn" type="submit" class="primary-btn" disabled>Book Buzz'en</button>
+    </form>
+  </section>
+
+</div>
+
+<script src="js/mock-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
