@@ -10,6 +10,6 @@
     "db:migrate:remote": "wrangler d1 execute tigerbuzz --remote --file=./schema.sql"
   },
   "devDependencies": {
-    "wrangler": "^3.78.0"
+    "wrangler": "^4.145.0"
   }
 }
