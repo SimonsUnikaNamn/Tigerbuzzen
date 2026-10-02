@@ -43,7 +43,7 @@ function combineDateTime(dateStr, timeStr) {
 /* ---------- Backend access ---------- */
 
 function getPassphrase() {
-  return sessionStorage.getItem("tigerbuzz-passphrase") || "";
+  return localStorage.getItem("tigerbuzz-passphrase") || "";
 }
 
 function authHeaders() {
@@ -463,7 +463,7 @@ async function verifyAndUnlock(passphrase) {
     });
 
     if (res.ok) {
-      sessionStorage.setItem("tigerbuzz-passphrase", passphrase);
+      localStorage.setItem("tigerbuzz-passphrase", passphrase);
       await unlockApp();
       return true;
     }
@@ -489,10 +489,10 @@ function initGate() {
   const input = document.getElementById("passphrase");
   const submitBtn = form.querySelector("button[type=submit]");
 
-  const stored = sessionStorage.getItem("tigerbuzz-passphrase");
+  const stored = localStorage.getItem("tigerbuzz-passphrase");
   if (stored) {
     verifyAndUnlock(stored).then((ok) => {
-      if (!ok) sessionStorage.removeItem("tigerbuzz-passphrase");
+      if (!ok) localStorage.removeItem("tigerbuzz-passphrase");
     });
   }
 
@@ -541,7 +541,7 @@ function initApp() {
   document.getElementById("booking-form").addEventListener("submit", submitBooking);
 
   document.getElementById("logout").addEventListener("click", () => {
-    sessionStorage.removeItem("tigerbuzz-passphrase");
+    localStorage.removeItem("tigerbuzz-passphrase");
     document.getElementById("app").hidden = true;
     document.getElementById("gate").hidden = false;
     document.getElementById("gate-error").hidden = true;
