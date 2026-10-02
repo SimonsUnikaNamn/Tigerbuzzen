@@ -1,7 +1,7 @@
 function corsHeaders(origin) {
   return {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
 }
@@ -90,6 +90,18 @@ async function handleCreateBooking(request, env, origin) {
   return json({ booking: inserted[0] }, 201, origin);
 }
 
+async function handleDeleteBooking(id, env, origin) {
+  const { results } = await env.DB.prepare(
+    `DELETE FROM bookings WHERE id = ?1 RETURNING id`
+  ).bind(id).all();
+
+  if (results.length === 0) {
+    return json({ error: "Booking not found." }, 404, origin);
+  }
+
+  return json({ deleted: true }, 200, origin);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -109,6 +121,11 @@ export default {
 
     if (url.pathname === "/api/bookings" && request.method === "POST") {
       return handleCreateBooking(request, env, origin);
+    }
+
+    const deleteMatch = url.pathname.match(/^\/api\/bookings\/(\d+)$/);
+    if (deleteMatch && request.method === "DELETE") {
+      return handleDeleteBooking(Number(deleteMatch[1]), env, origin);
     }
 
     return json({ error: "Not found" }, 404, origin);

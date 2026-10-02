@@ -82,6 +82,7 @@ function buildDayBookingsMap(rawBookings, year, month) {
         const start = b.start_at > dayStart ? b.start_at.slice(11, 16) : "00:00";
         const end = b.end_at < nextDayStart ? b.end_at.slice(11, 16) : "24:00";
         return {
+          id: b.id,
           start,
           end,
           fullDay: start === "00:00" && end === "24:00",
@@ -205,7 +206,12 @@ function openDaySheet(key) {
             <p class="booking-name">${b.borrower}</p>
             <p class="booking-purpose">${b.purpose}</p>
           </div>
+          <button type="button" class="booking-delete-btn" aria-label="Slett booking">🗑</button>
         `;
+        row.querySelector(".booking-delete-btn").addEventListener("click", () => {
+          const when = b.fullDay ? "hele dagen" : `${b.start}–${b.end}`;
+          openConfirmDialog(b.id, `Slette bookingen til ${b.borrower} (${when})? Dette kan ikke angres.`);
+        });
         list.appendChild(row);
       });
   }
@@ -224,8 +230,69 @@ function closeAllSheets() {
   const modal = document.getElementById("booking-sheet");
   modal.hidden = true;
   modal.setAttribute("aria-hidden", "true");
+  const confirmDialog = document.getElementById("confirm-dialog");
+  confirmDialog.hidden = true;
+  confirmDialog.setAttribute("aria-hidden", "true");
+  pendingDeleteId = null;
   state.selectedKey = null;
   renderCalendar();
+}
+
+/* ---------- Delete confirmation ---------- */
+
+let pendingDeleteId = null;
+
+function openConfirmDialog(bookingId, message) {
+  pendingDeleteId = bookingId;
+  document.getElementById("confirm-message").textContent = message;
+
+  const btn = document.getElementById("confirm-delete-btn");
+  btn.disabled = false;
+  btn.textContent = "Slett";
+
+  document.getElementById("sheet-backdrop").hidden = false;
+  const dialog = document.getElementById("confirm-dialog");
+  dialog.hidden = false;
+  dialog.setAttribute("aria-hidden", "false");
+}
+
+function closeConfirmDialog() {
+  pendingDeleteId = null;
+  const dialog = document.getElementById("confirm-dialog");
+  dialog.hidden = true;
+  dialog.setAttribute("aria-hidden", "true");
+
+  const daySheetOpen = !document.getElementById("day-sheet").hidden;
+  const bookingSheetOpen = !document.getElementById("booking-sheet").hidden;
+  if (!daySheetOpen && !bookingSheetOpen) {
+    document.getElementById("sheet-backdrop").hidden = true;
+  }
+}
+
+async function confirmDelete() {
+  if (pendingDeleteId == null) return;
+
+  const btn = document.getElementById("confirm-delete-btn");
+  btn.disabled = true;
+  btn.textContent = "Sletter …";
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/bookings/${pendingDeleteId}`, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+
+    if (!res.ok && res.status !== 404) throw new Error("delete failed");
+
+    state.monthCache = {};
+    const reopenKey = state.selectedKey;
+    closeConfirmDialog();
+    await renderCalendar();
+    if (reopenKey) openDaySheet(reopenKey);
+  } catch {
+    btn.disabled = false;
+    btn.textContent = "Kunne ikke slette — prøv igjen";
+  }
 }
 
 function changeMonth(delta) {
@@ -450,8 +517,17 @@ function initApp() {
   document.getElementById("next-month").addEventListener("click", () => changeMonth(1));
 
   document.getElementById("sheet-close").addEventListener("click", closeAllSheets);
-  document.getElementById("sheet-backdrop").addEventListener("click", closeAllSheets);
   document.getElementById("booking-close").addEventListener("click", closeAllSheets);
+  document.getElementById("sheet-backdrop").addEventListener("click", () => {
+    if (!document.getElementById("confirm-dialog").hidden) {
+      closeConfirmDialog();
+    } else {
+      closeAllSheets();
+    }
+  });
+
+  document.getElementById("confirm-cancel-btn").addEventListener("click", closeConfirmDialog);
+  document.getElementById("confirm-delete-btn").addEventListener("click", confirmDelete);
 
   document.getElementById("open-booking-btn").addEventListener("click", () => {
     openBookingModal(state.selectedKey || todayKey());
