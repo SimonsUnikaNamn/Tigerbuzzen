@@ -13,6 +13,16 @@ function json(data, status, origin) {
   });
 }
 
+function resolveAllowedOrigin(request, env) {
+  const requestOrigin = request.headers.get("Origin") || "";
+  const allowList = (env.ALLOWED_ORIGIN || "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+
+  return allowList.includes(requestOrigin) ? requestOrigin : (allowList[0] || "");
+}
+
 function isAuthorized(request, env) {
   const auth = request.headers.get("Authorization") || "";
   const [scheme, token] = auth.split(" ");
@@ -105,7 +115,7 @@ async function handleDeleteBooking(id, env, origin) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const origin = env.ALLOWED_ORIGIN || "*";
+    const origin = resolveAllowedOrigin(request, env);
 
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders(origin) });
